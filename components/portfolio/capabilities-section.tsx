@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card"
+
 import { Badge } from "@/components/ui/badge"
 import type { AboutData } from "@/types/github"
 
@@ -12,14 +12,14 @@ export function CapabilitiesSection({ about }: CapabilitiesSectionProps) {
   return (
     <section className="w-full py-16 border-b border-border">
       <div className="space-y-12">
-        {about.summary && (
-          <div className="max-w-3xl">
-            <h2 className="text-2xl font-semibold tracking-tight mb-6">About</h2>
-            <p className="text-lg md:text-xl text-foreground/90 leading-relaxed font-light">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight mb-4">About</h2>
+          {about.summary && (
+            <p className="text-base text-foreground/80 leading-relaxed">
               {about.summary}
             </p>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {about.highlights && about.highlights.length > 0 && (
