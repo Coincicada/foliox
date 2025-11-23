@@ -140,6 +140,11 @@ foliox/
 - `GET /api/user/[username]/projects` - Get featured projects and language statistics
 - `GET /api/user/[username]/about` - Get AI-generated about section
 - `GET /api/user/[username]/contributions` - Get contribution graph data
+- `GET /api/user/[username]/prs-by-org` - Get pull requests grouped by organization
+
+### GitHub
+
+- `GET /api/github/stars` - Fetch current star count for the Foliox repository (no caching, real-time)
 
 ### Custom URLs
 
@@ -214,13 +219,16 @@ npx prisma migrate dev
 
 ## Caching Strategy
 
-The application uses a database-backed caching system:
+The application uses a database-backed caching system for most endpoints:
 
 - Cache entries are stored in PostgreSQL with expiration times
 - Default TTL is 3600 seconds (1 hour)
-- Automatic cleanup of expired entries
+- Automatic cleanup of expired entries (1% chance on each write)
 - Tag-based cache organization for easy invalidation
 - Cache is checked before making external API calls
+- Most portfolio endpoints use caching to reduce API calls and improve performance
+
+**Note**: Some endpoints like `/api/github/stars` intentionally bypass caching to provide real-time data. These endpoints use `cache: "no-store"` and appropriate cache-control headers to ensure fresh data on every request.
 
 ## Deployment
 

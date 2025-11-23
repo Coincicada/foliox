@@ -4,13 +4,14 @@ import { Settings } from "@/lib/config/settings"
 const REPO_OWNER = "kartiklabhshetwar"
 const REPO_NAME = "foliox"
 
-async function fetchGitHubStars(): Promise<number> {
+async function fetchGitHubStars(useToken: boolean = true): Promise<number> {
   const headers: HeadersInit = {
-    Accept: "application/vnd.github.v3+json",
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": "Foliox/1.0",
   }
 
-  if (Settings.GITHUB_TOKEN) {
+  if (useToken && Settings.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${Settings.GITHUB_TOKEN}`
   }
 
@@ -23,6 +24,13 @@ async function fetchGitHubStars(): Promise<number> {
   )
 
   if (!response.ok) {
+    if (response.status === 401 && useToken && Settings.GITHUB_TOKEN) {
+      if (Settings.DEBUG) {
+        console.warn("GitHub API returned 401 with token, retrying without token")
+      }
+      return fetchGitHubStars(false)
+    }
+    
     const errorText = await response.text().catch(() => "Unknown error")
     throw new Error(
       `GitHub API error: ${response.status} ${response.statusText} - ${errorText}`
@@ -50,9 +58,13 @@ export async function GET() {
     
     if (Settings.DEBUG) {
       console.error("Failed to fetch GitHub stars:", errorMessage)
+      console.error("GITHUB_TOKEN present:", !!Settings.GITHUB_TOKEN)
     }
 
-    return NextResponse.json({ stars: 0 }, { 
+    return NextResponse.json({ 
+      stars: 0,
+      error: Settings.DEBUG ? errorMessage : undefined
+    }, { 
       status: 200,
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
