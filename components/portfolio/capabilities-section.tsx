@@ -11,11 +11,11 @@ export function CapabilitiesSection({ about }: CapabilitiesSectionProps) {
 
   return (
     <section className="w-full py-16 border-b border-border">
-      <div className="space-y-12">
+      <div className="space-y-10">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight mb-4">About</h2>
           {about.summary && (
-            <p className="text-base text-foreground/80 leading-relaxed">
+            <p className="text-base text-foreground/90 leading-relaxed max-w-4xl">
               {about.summary}
             </p>
           )}
@@ -23,13 +23,13 @@ export function CapabilitiesSection({ about }: CapabilitiesSectionProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {about.highlights && about.highlights.length > 0 && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Highlights</h3>
-              <ul className="space-y-4">
+              <ul className="space-y-3.5">
                 {about.highlights.map((highlight, index) => (
-                  <li key={index} className="flex items-start gap-3 group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 group-hover:scale-125 transition-transform" />
-                    <span className="text-foreground/80 leading-relaxed">{highlight}</span>
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                    <span className="text-sm text-foreground/80 leading-relaxed">{highlight}</span>
                   </li>
                 ))}
               </ul>
@@ -37,14 +37,14 @@ export function CapabilitiesSection({ about }: CapabilitiesSectionProps) {
           )}
 
           {about.skills && about.skills.length > 0 && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {about.skills.map((skill) => (
                   <Badge 
                     key={skill} 
                     variant="secondary" 
-                    className="px-3 py-1 text-sm font-normal bg-secondary/50 hover:bg-secondary transition-colors"
+                    className="px-3 py-1.5 text-sm font-normal bg-secondary/50 hover:bg-secondary transition-colors"
                   >
                     {skill}
                   </Badge>

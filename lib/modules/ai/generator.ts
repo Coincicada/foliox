@@ -17,10 +17,10 @@ export class AIDescriptionGenerator {
       const { text } = await generateText({
         model: this.model,
         system:
-          'You are a masterful storyteller and technical biographer who crafts compelling narratives about developers. Write in a storytelling format that weaves together their journey, achievements, and impact. Use vivid language, narrative flow, and engaging anecdotes. Make the reader feel the developer\'s passion and see their evolution. Write as if telling a story about their professional journey, not just listing facts.',
+          'You are a professional technical writer specializing in developer profiles. Write clear, concise, and professional content that highlights technical achievements and expertise. Use professional language, avoid flowery prose or excessive storytelling. Focus on facts, metrics, and concrete achievements. Keep the tone professional and suitable for a portfolio website.',
         prompt,
-        temperature: 0.8,
-        maxOutputTokens: 600,
+        temperature: 0.5,
+        maxOutputTokens: 500,
       });
 
       return this.parseProfileSummary(text, profile);
@@ -56,7 +56,7 @@ PRs Open: ${profile.metrics.prs_open}
 Total Contributions: ${profile.metrics.total_contributions || 'N/A'}
 ` : '';
 
-    return `Craft a compelling storytelling narrative about ${profile.name || profile.username}, a developer whose journey and impact deserve to be told.
+    return `Create a professional developer profile summary for ${profile.name || profile.username}.
 
 Bio: ${profile.bio || 'Not provided'}
 Location: ${profile.location || 'Not specified'}
@@ -65,16 +65,16 @@ Public Repositories: ${profile.public_repos}
 Followers: ${profile.followers}
 ${metrics}
 
-Write in a storytelling format that:
-1. Opens with a narrative summary (3-4 sentences) that tells their story - where they started, what drives them, and their impact. Use vivid, engaging language.
-2. Highlights (3-5 items) written as story beats - each should feel like a chapter in their journey, not just a bullet point. Use phrases like "From building X to achieving Y" or "Their journey led them to..."
-3. Skills (5-8 items) presented as areas where their expertise shines
+Generate professional content:
+1. Summary (2-3 sentences): A concise, professional overview highlighting their expertise, experience, and key achievements. Focus on technical skills and contributions. Avoid flowery language or excessive storytelling.
+2. Highlights (3-4 items): Concise bullet points focusing on concrete achievements and metrics. Format as: "X public repositories" or "Y followers" or "Z merged pull requests". Keep factual and professional.
+3. Skills (5-7 items): Technical skills and areas of expertise. Use professional terminology like "Software Development", "Version Control", "Open Source Contributions", etc.
 
 IMPORTANT: Return ONLY valid JSON. Do not include markdown code blocks, explanations, or any text outside the JSON object. Start with { and end with }.
 
 {
-  "summary": "A narrative opening that tells their story...",
-  "highlights": ["Story-driven highlight 1...", "Story-driven highlight 2..."],
+  "summary": "Professional 2-3 sentence summary...",
+  "highlights": ["Concise highlight 1", "Concise highlight 2"],
   "skills": ["Skill 1", "Skill 2", ...]
 }`;
   }
