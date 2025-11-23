@@ -230,10 +230,10 @@ export default function LandingPage() {
                   <div className="pt-4 text-sm text-white/80">
                     <span className="mr-2">Try example:</span>
                     <button
-                      onClick={() => setUsername("torvalds")}
+                      onClick={() => setUsername("t3dotgg")}
                       className="underline hover:text-white transition-colors"
                     >
-                      Linus Torvalds
+                      Theo Browne
                     </button>
                   </div>
                 </div>
