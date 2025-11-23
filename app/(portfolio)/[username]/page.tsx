@@ -7,6 +7,7 @@ import { ProofOfWorkSection } from "@/components/portfolio/proof-of-work-section
 import { WorkExperienceSection } from "@/components/portfolio/work-experience-section"
 import { PRsByOrgSection } from "@/components/portfolio/prs-by-org-section"
 import { GetInTouchSection } from "@/components/portfolio/get-in-touch-section"
+import { PortfolioTracker } from "@/components/portfolio/portfolio-tracker"
 import DiagonalPattern from "@/components/portfolio/diagonal-pattern"
 import type { PortfolioData } from "@/types/portfolio"
 import type { PRByOrg } from "@/components/portfolio/prs-by-org-section"
@@ -114,8 +115,11 @@ export default async function PortfolioPage({ params }: PageProps) {
     notFound()
   }
 
+  const wasCached = data.profile.cached ?? false
+
   return (
     <div className="min-h-screen bg-background relative">
+      <PortfolioTracker username={username} wasCached={wasCached} />
       <DiagonalPattern side="left" />
       <DiagonalPattern side="right" />
 

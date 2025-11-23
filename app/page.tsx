@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Github, Wand2, Star } from "lucide-react"
 import Link from "next/link"
+import { trackEvent } from "@/lib/utils/analytics"
 
 export default function LandingPage() {
   const [username, setUsername] = useState("")
@@ -32,6 +33,10 @@ export default function LandingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!username.trim()) return
+
+    trackEvent('portfolio-generation-started', {
+      username: username.trim(),
+    })
 
     setIsLoading(true)
     router.push(`/${username.trim()}`)
