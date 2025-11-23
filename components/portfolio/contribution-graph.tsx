@@ -1,14 +1,42 @@
 "use client"
 
+import React from "react"
+import { GitHubCalendar } from "react-github-calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { ContributionData } from "@/types/portfolio"
 
 interface ContributionGraphProps {
   username: string
-  data?: ContributionData
+  data?: unknown
 }
 
 export function ContributionGraph({ username }: ContributionGraphProps) {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const theme = {
+    light: ["#ebedf0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
+    dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
+  }
+
+  if (!mounted) {
+    return (
+      <section className="w-full py-6">
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">GitHub Activity</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Contribution Graph</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full h-[160px] rounded-xl bg-muted animate-pulse" />
+          </CardContent>
+        </Card>
+      </section>
+    )
+  }
+
   return (
     <section className="w-full py-6">
       <h2 className="text-2xl md:text-3xl font-bold mb-6">GitHub Activity</h2>
@@ -19,20 +47,25 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
         </CardHeader>
         <CardContent>
           <div className="w-full overflow-x-auto">
-            <img
-              src={`https://ghchart.rshah.org/${username}`}
-              alt={`${username}'s GitHub contribution graph`}
-              className="w-full max-w-4xl mx-auto"
-            />
+            <div className="relative overflow-hidden rounded-xl p-3 hover:shadow-sm transition-shadow duration-300">
+              <GitHubCalendar
+                username={username}
+                fontSize={12}
+                blockSize={12}
+                blockMargin={4}
+                showWeekdayLabels={true}
+                theme={theme}
+              />
+            </div>
           </div>
           <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
             <span>Less</span>
             <div className="flex gap-1">
-              <div className="w-3 h-3 rounded-sm bg-muted" />
-              <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900" />
-              <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-700" />
-              <div className="w-3 h-3 rounded-sm bg-green-600 dark:bg-green-500" />
-              <div className="w-3 h-3 rounded-sm bg-green-800 dark:bg-green-300" />
+              <div className="w-3 h-3 rounded-sm bg-[#ebedf0] dark:bg-[#161b22]" />
+              <div className="w-3 h-3 rounded-sm bg-[#c6e48b] dark:bg-[#0e4429]" />
+              <div className="w-3 h-3 rounded-sm bg-[#7bc96f] dark:bg-[#006d32]" />
+              <div className="w-3 h-3 rounded-sm bg-[#239a3b] dark:bg-[#26a641]" />
+              <div className="w-3 h-3 rounded-sm bg-[#196127] dark:bg-[#39d353]" />
             </div>
             <span>More</span>
           </div>

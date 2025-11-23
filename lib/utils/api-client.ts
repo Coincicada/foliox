@@ -1,5 +1,5 @@
 import type { NormalizedProfile, ProjectsData, AboutData } from "@/types/github"
-import type { PortfolioData } from "@/types/portfolio"
+import type { PortfolioData, ContributionData } from "@/types/portfolio"
 
 interface FetchOptions {
   cache?: RequestCache
@@ -81,6 +81,13 @@ export class APIClient {
   async getAbout(username: string, options?: FetchOptions) {
     return this.fetch<{ about: AboutData | null }>(
       `/api/user/${username}/about`,
+      options
+    )
+  }
+
+  async getContributions(username: string, options?: FetchOptions) {
+    return this.fetch<ContributionData>(
+      `/api/user/${username}/contributions`,
       options
     )
   }
