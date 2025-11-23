@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Settings } from '@/lib/config/settings';
+import { getCache, setCache, getCacheKey } from '@/lib/utils/cache';
 
 interface ScreenshotParams {
   url: string;
@@ -96,17 +97,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const cacheKey = getCacheKey('screenshot', url, width.toString(), height.toString(), fullPage.toString(), format, quality.toString());
+    
+    const cachedScreenshot = await getCache<{ data: string; contentType: string }>(cacheKey);
+    
+    if (cachedScreenshot) {
+      const buffer = Buffer.from(cachedScreenshot.data, 'base64');
+      return new NextResponse(new Uint8Array(buffer), {
+        status: 200,
+        headers: {
+          'Content-Type': cachedScreenshot.contentType,
+          'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+          'X-Cache': 'HIT',
+        },
+      });
+    }
+
     const screenshotBuffer = await fetchScreenshot({ url, width, height, fullPage, format, quality });
 
     const contentType = format === 'pdf' 
       ? 'application/pdf' 
       : `image/${format}`;
 
+    const base64Data = screenshotBuffer.toString('base64');
+    await setCache(
+      cacheKey,
+      { data: base64Data, contentType },
+      {
+        ttl: 86400,
+        tags: ['screenshot', `url:${url}`],
+      }
+    );
+
     return new NextResponse(new Uint8Array(screenshotBuffer), {
       status: 200,
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+        'X-Cache': 'MISS',
       },
     });
   } catch (error) {

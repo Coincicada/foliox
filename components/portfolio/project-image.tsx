@@ -35,10 +35,14 @@ export function ProjectImage({
       src={imageSrc}
       alt={alt}
       fill={fill}
-      className={className}
+      className={`${className || ''} object-cover object-center`}
       sizes={sizes}
       unoptimized={unoptimized}
       onError={handleError}
+      style={{
+        objectFit: 'cover',
+        objectPosition: 'center',
+      }}
     />
   )
 }
