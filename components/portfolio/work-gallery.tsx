@@ -2,9 +2,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { FaExternalLinkAlt, FaGithub, FaStar, FaCodeBranch } from "react-icons/fa"
-import Image from "next/image"
 import type { ProjectsData } from "@/types/github"
 import SectionBorder from "./section-border"
+import { ProjectImage } from "./project-image"
 
 interface WorkGalleryProps {
   projects?: ProjectsData
@@ -35,7 +35,11 @@ export function WorkGallery({ projects }: WorkGalleryProps) {
             const urlParts = project.url.split('/')
             const owner = urlParts[urlParts.length - 2]
             const repo = urlParts[urlParts.length - 1]
-            const imageUrl = `https://opengraph.githubassets.com/1/${owner}/${repo}`
+            const fallbackImageUrl = `https://opengraph.githubassets.com/1/${owner}/${repo}`
+            
+            const imageUrl = project.homepage
+              ? `/api/screenshot?url=${encodeURIComponent(project.homepage)}&width=1280&height=800&format=png`
+              : fallbackImageUrl
 
             return (
               <Card 
@@ -43,8 +47,9 @@ export function WorkGallery({ projects }: WorkGalleryProps) {
                 className="flex flex-col overflow-hidden border-border bg-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 group h-full"
               >
                 <div className="aspect-video w-full overflow-hidden bg-muted border-b border-border relative">
-                  <Image 
+                  <ProjectImage 
                     src={imageUrl} 
+                    fallbackSrc={fallbackImageUrl}
                     alt={project.name} 
                     fill
                     className="object-cover object-center"

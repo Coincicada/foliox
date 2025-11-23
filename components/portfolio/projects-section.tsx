@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { BsStar, BsGit, BsBoxArrowUpRight } from "react-icons/bs"
 import { FaGithub } from "react-icons/fa"
 import type { ProjectsData } from "@/types/github"
+import { ProjectImage } from "./project-image"
 
 interface ProjectsSectionProps {
   projects?: ProjectsData
@@ -21,21 +22,44 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {projects.featured.slice(0, 6).map((project) => (
-          <Card key={project.name} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex justify-between items-start gap-2">
-                <CardTitle className="text-lg">
-                  {project.name}
-                </CardTitle>
-              </div>
-              {project.description && (
-                <CardDescription className="line-clamp-2">
-                  {project.description}
-                </CardDescription>
+        {projects.featured.slice(0, 6).map((project) => {
+          const urlParts = project.url.split('/')
+          const owner = urlParts[urlParts.length - 2]
+          const repo = urlParts[urlParts.length - 1]
+          const fallbackImageUrl = `https://opengraph.githubassets.com/1/${owner}/${repo}`
+          
+          const imageUrl = project.homepage
+            ? `/api/screenshot?url=${encodeURIComponent(project.homepage)}&width=1280&height=800&format=png`
+            : fallbackImageUrl
+
+          return (
+            <Card key={project.name} className="hover:shadow-md transition-shadow overflow-hidden">
+              {project.homepage && (
+                <div className="aspect-video w-full overflow-hidden bg-muted border-b border-border relative">
+                  <ProjectImage 
+                    src={imageUrl} 
+                    fallbackSrc={fallbackImageUrl}
+                    alt={project.name} 
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    unoptimized
+                  />
+                </div>
               )}
-            </CardHeader>
-            <CardContent className="space-y-3">
+              <CardHeader>
+                <div className="flex justify-between items-start gap-2">
+                  <CardTitle className="text-lg">
+                    {project.name}
+                  </CardTitle>
+                </div>
+                {project.description && (
+                  <CardDescription className="line-clamp-2">
+                    {project.description}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-3">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 {project.language && (
                   <div className="flex items-center gap-1">
@@ -85,9 +109,10 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                   </a>
                 )}
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
       {projects.languages && Object.keys(projects.languages).length > 0 && (

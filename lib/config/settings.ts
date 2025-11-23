@@ -9,6 +9,7 @@ const envSchema = z.object({
   DEFAULT_CACHE_TTL: z.string().default('3600').transform(val => parseInt(val, 10)),
   DEBUG: z.string().default('false').transform(val => val === 'true'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  SCREENSHOT_API_URL: z.string().url().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
@@ -24,6 +25,7 @@ function validateEnv(): Env {
       DEFAULT_CACHE_TTL: process.env.DEFAULT_CACHE_TTL,
       DEBUG: process.env.DEBUG,
       NODE_ENV: process.env.NODE_ENV,
+      SCREENSHOT_API_URL: process.env.SCREENSHOT_API_URL,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -45,5 +47,6 @@ export const Settings = {
   DEFAULT_CACHE_TTL: env.DEFAULT_CACHE_TTL,
   DEBUG: env.DEBUG,
   NODE_ENV: env.NODE_ENV,
+  SCREENSHOT_API_URL: env.SCREENSHOT_API_URL,
 } as const;
 

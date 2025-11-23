@@ -34,6 +34,8 @@ foliox/
 │   │   │       └── prs-by-org/route.ts   # GET /api/user/:username/prs-by-org
 │   │   └── linkedin/
 │   │       └── [username]/route.ts       # GET /api/linkedin/:username
+│   │   └── screenshot/
+│   │       └── route.ts                   # GET /api/screenshot
 │   ├── layout.tsx
 │   └── page.tsx                   # Landing page
 ├── components/
@@ -41,6 +43,7 @@ foliox/
 │   │   ├── hero-section.tsx
 │   │   ├── share-button.tsx      # Share dialog with custom URL creation
 │   │   ├── projects-section.tsx
+│   │   ├── project-image.tsx     # Client component for project screenshots with fallback
 │   │   └── ...
 │   └── ui/                        # Reusable UI components (Shadcn)
 ├── lib/
@@ -252,6 +255,38 @@ Fetches LinkedIn profile data.
 }
 ```
 
+### Screenshot Endpoint
+
+#### 10. GET `/api/screenshot`
+Captures screenshots of websites for project previews. This endpoint wraps the Screenshot API service to provide live screenshots of project homepages.
+
+**Query Parameters:**
+- `url` (required): The URL of the website to capture
+- `width` (optional): Viewport width in pixels (default: 1280, max: 3840)
+- `height` (optional): Viewport height in pixels (default: 800, max: 2160)
+- `format` (optional): Output format - `png`, `jpeg`, or `pdf` (default: `png`)
+- `quality` (optional): Image quality for JPEG format, 1-100 (default: 80)
+- `fullPage` (optional): Capture full page height (default: `false`)
+
+**Response:**
+Returns binary image data (PNG/JPEG) or PDF with appropriate `Content-Type` header.
+
+**Example:**
+```
+GET /api/screenshot?url=https://example.com&width=1280&height=800&format=png
+```
+
+**Error Responses:**
+- `400`: Invalid URL format or parameter validation failed
+- `500`: Screenshot capture failed
+- `503`: Screenshot service not configured (`SCREENSHOT_API_URL` missing)
+
+**Features:**
+- Automatic fallback to GitHub OpenGraph images if screenshot fails
+- HTTP caching headers (24 hours) for performance
+- URL validation and parameter sanitization
+- Supports multiple output formats
+
 All API endpoints require an `X-API-Key` header (except when `DEBUG=true`). The API key must match one of the keys in the `API_KEYS` environment variable.
 
 ## Key Features
@@ -315,6 +350,15 @@ All API endpoints require an `X-API-Key` header (except when `DEBUG=true`). The 
 - Returns top 12 featured projects
 - Aggregates language statistics across all repositories
 
+### 8. Screenshot API Integration (`app/api/screenshot/route.ts`)
+- Wraps external Screenshot API service for capturing live project screenshots
+- Validates URLs and parameters (width, height, format, quality)
+- Returns binary image data with proper content types
+- Implements HTTP caching (24 hours) for performance
+- Graceful error handling with fallback to GitHub OpenGraph images
+- Used in project cards to display live previews of project homepages
+- Client component (`ProjectImage`) handles error states and fallback logic
+
 ## Database Schema
 
 The application uses PostgreSQL with Prisma ORM. The schema includes:
@@ -348,6 +392,7 @@ Optional:
 - `DEFAULT_CACHE_TTL`: Cache time-to-live in seconds (default: 3600)
 - `DEBUG`: Bypass API key authentication (default: false)
 - `NODE_ENV`: Environment mode (development/production/test)
+- `SCREENSHOT_API_URL`: URL of the Screenshot API service (e.g., `https://your-worker.workers.dev`) - Required for live project screenshots
 
 ## Performance Optimizations
 

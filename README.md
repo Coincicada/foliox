@@ -12,6 +12,7 @@ Foliox is an AI-powered portfolio generator that automatically creates beautiful
 - **SEO Optimized**: Dynamic metadata generation for better search engine visibility
 - **Responsive Design**: Works perfectly on all devices with dark mode support
 - **LinkedIn Integration**: Optional LinkedIn profile data fetching
+- **Live Project Screenshots**: Automatically captures and displays live screenshots of project homepages using Screenshot API
 
 ## How It Works
 
@@ -101,6 +102,8 @@ foliox/
 │   │   │       └── contributions/ # Contribution graph data
 │   │   └── linkedin/
 │   │       └── [username]/       # LinkedIn profile data
+│   │   └── screenshot/
+│   │       └── route.ts          # Screenshot API endpoint
 │   ├── layout.tsx                 # Root layout
 │   └── page.tsx                   # Landing page
 ├── components/
@@ -108,6 +111,7 @@ foliox/
 │   │   ├── hero-section.tsx
 │   │   ├── share-button.tsx      # Share with custom URL creation
 │   │   ├── projects-section.tsx
+│   │   ├── project-image.tsx     # Project screenshot component with fallback
 │   │   └── ...
 │   └── ui/                        # Reusable UI components (Shadcn)
 ├── lib/
@@ -150,6 +154,17 @@ foliox/
 ### LinkedIn
 
 - `GET /api/linkedin/[username]` - Fetch LinkedIn profile data
+
+### Screenshot
+
+- `GET /api/screenshot` - Capture screenshots of websites for project previews
+  - Query parameters:
+    - `url` (required): The URL to capture
+    - `width` (optional): Viewport width in pixels (default: 1280)
+    - `height` (optional): Viewport height in pixels (default: 800)
+    - `format` (optional): Output format - png, jpeg, or pdf (default: png)
+    - `quality` (optional): Image quality for JPEG, 1-100 (default: 80)
+    - `fullPage` (optional): Capture full page height (default: false)
 
 All API endpoints require an `X-API-Key` header (except when `DEBUG=true`). The API key must match one of the keys in the `API_KEYS` environment variable.
 
@@ -201,6 +216,7 @@ npx prisma migrate dev
 - `DEFAULT_CACHE_TTL`: Cache time-to-live in seconds (default: 3600)
 - `DEBUG`: Bypass API key authentication (default: false)
 - `NODE_ENV`: Environment mode (development/production/test)
+- `SCREENSHOT_API_URL`: URL of the Screenshot API service (e.g., `https://your-worker.workers.dev`) - Required for live project screenshots
 
 ## Tech Stack
 
