@@ -10,15 +10,32 @@ interface ContributionGraphProps {
 
 export function ContributionGraph({ username }: ContributionGraphProps) {
   const [mounted, setMounted] = React.useState(false)
+  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 })
 
   React.useEffect(() => {
     setMounted(true)
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      })
+    }
+    updateDimensions()
+    window.addEventListener("resize", updateDimensions)
+    return () => window.removeEventListener("resize", updateDimensions)
   }, [])
 
   const theme = {
     light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
     dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
   }
+
+  const isMobile = dimensions.width < 640
+  const isTablet = dimensions.width >= 640 && dimensions.width < 1024
+
+  const blockSize = isMobile ? 10 : isTablet ? 11 : 13
+  const blockMargin = isMobile ? 3 : isTablet ? 3 : 4
+  const fontSize = isMobile ? 10 : 11
 
   if (!mounted) {
     return (
@@ -31,8 +48,8 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
             </p>
           </div>
           <Card className="border-border">
-            <CardContent className="p-4 sm:p-6 md:p-8">
-              <div className="w-full h-[120px] sm:h-[160px] bg-muted/50 animate-pulse rounded-md" />
+            <CardContent className="p-4 sm:p-6 md:p-8 lg:p-10">
+              <div className="w-full h-[140px] sm:h-[180px] md:h-[220px] bg-muted/50 animate-pulse rounded-md" />
             </CardContent>
           </Card>
         </div>
@@ -50,14 +67,14 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
           </p>
         </div>
         <Card className="border-border">
-          <CardContent className="p-4 sm:p-6 md:p-8">
-            <div className="w-full flex justify-center overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-              <div className="min-w-fit">
+          <CardContent className="p-3 sm:p-6 md:p-8 lg:p-10">
+            <div className="w-full overflow-x-auto">
+              <div className={`${isMobile ? "min-w-[650px]" : "w-full"} flex justify-center`}>
                 <GitHubCalendar
                   username={username}
-                  fontSize={10}
-                  blockSize={10}
-                  blockMargin={3}
+                  fontSize={fontSize}
+                  blockSize={blockSize}
+                  blockMargin={blockMargin}
                   showWeekdayLabels={true}
                   colorScheme="light"
                   theme={{

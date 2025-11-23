@@ -1,5 +1,6 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { FaGithub, FaLinkedin, FaGlobe, FaEnvelope, FaMapMarkerAlt, FaInstagram } from "react-icons/fa"
 import { FaXTwitter, FaCodeBranch, FaCodePullRequest } from "react-icons/fa6"
 import type { NormalizedProfile, AboutData, GitHubMetrics } from "@/types/github"
@@ -84,56 +85,93 @@ export function HeroSection({ profile, metrics }: HeroSectionProps) {
           )}
 
           <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-            <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-              <a href={`https://github.com/${profile.username}`} target="_blank" rel="noopener noreferrer">
-                <FaGithub className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
-                <span className="hidden sm:inline">GitHub</span>
-                <span className="sm:hidden">GH</span>
-              </a>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                  <a href={`https://github.com/${profile.username}`} target="_blank" rel="noopener noreferrer">
+                    <FaGithub className="h-3 w-3 sm:h-3.5 sm:w-3.5 sm:mr-2" />
+                    <span className="hidden sm:inline">GitHub</span>
+                  </a>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>GitHub</p>
+              </TooltipContent>
+            </Tooltip>
             {profile.linkedin_url && (
-              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
-                  <FaLinkedin className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">LinkedIn</span>
-                  <span className="sm:hidden">LI</span>
-                </a>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                    <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                      <FaLinkedin className="h-3 w-3 sm:h-3.5 sm:w-3.5 sm:mr-2" />
+                      <span className="hidden sm:inline">LinkedIn</span>
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>LinkedIn</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {profile.instagram_url && (
-              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer">
-                  <FaInstagram className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">Instagram</span>
-                  <span className="sm:hidden">IG</span>
-                </a>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                    <a href={profile.instagram_url} target="_blank" rel="noopener noreferrer">
+                      <FaInstagram className="h-3 w-3 sm:h-3.5 sm:w-3.5 sm:mr-2" />
+                      <span className="hidden sm:inline">Instagram</span>
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Instagram</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {profile.twitter_username && (
-              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                <a href={`https://twitter.com/${profile.twitter_username}`} target="_blank" rel="noopener noreferrer">
-                  <FaXTwitter className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
-                  <span>X</span>
-                </a>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                    <a href={`https://twitter.com/${profile.twitter_username}`} target="_blank" rel="noopener noreferrer">
+                      <FaXTwitter className="h-3 w-3 sm:h-3.5 sm:w-3.5 sm:mr-2" />
+                      <span className="hidden sm:inline">X</span>
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>X (Twitter)</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {profile.website && (
-              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                <a href={profile.website} target="_blank" rel="noopener noreferrer">
-                  <FaGlobe className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">Website</span>
-                  <span className="sm:hidden">Web</span>
-                </a>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                    <a href={profile.website} target="_blank" rel="noopener noreferrer">
+                      <FaGlobe className="h-3 w-3 sm:h-3.5 sm:w-3.5 sm:mr-2" />
+                      <span className="hidden sm:inline">Website</span>
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Website</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {profile.email && (
-              <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
-                <a href={`mailto:${profile.email}`}>
-                  <FaEnvelope className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1.5 sm:mr-2" />
-                  <span className="hidden sm:inline">Email</span>
-                  <span className="sm:hidden">Mail</span>
-                </a>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+                    <a href={`mailto:${profile.email}`}>
+                      <FaEnvelope className="h-3 w-3 sm:h-3.5 sm:w-3.5 sm:mr-2" />
+                      <span className="hidden sm:inline">Email</span>
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Email</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </div>
