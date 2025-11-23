@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyUsername } from '@/lib/utils/user';
+import { resolveProfile } from '@/lib/services/profile-cache';
 
 export async function GET(
   request: NextRequest,
@@ -7,18 +8,26 @@ export async function GET(
 ) {
   try {
     const { username: rawUsername } = await context.params;
-    verifyUsername(rawUsername);
+    const username = verifyUsername(rawUsername);
+
+    const { profile } = await resolveProfile(username);
 
     return NextResponse.json(
-      { detail: 'Use /api/user/:username/profile endpoint to get about data' },
+      { about: profile.about ?? null, cached: profile.cached ?? false },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     if (errorMessage.includes('Invalid')) {
       return NextResponse.json(
         { detail: errorMessage },
         { status: 400 }
+      );
+    }
+    if (errorMessage.includes('not found')) {
+      return NextResponse.json(
+        { detail: errorMessage },
+        { status: 404 }
       );
     }
 

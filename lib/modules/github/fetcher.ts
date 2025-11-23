@@ -268,46 +268,24 @@ export class GitHubProfileFetcher {
       let twitterUrl: string | undefined;
       let instagramUrl: string | undefined;
 
-      const extractLinkedInFromText = (text: string): string | undefined => {
-        if (!text) return undefined;
-        
-        const patterns = [
-          /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([a-zA-Z0-9-]+)/gi,
-          /linkedin\.com\/in\/([a-zA-Z0-9-]+)/gi,
-          /\[LinkedIn\]\((https?:\/\/[^\s\)]+linkedin\.com[^\s\)]+)\)/gi,
-          /linkedin:\s*(https?:\/\/[^\s]+)/gi,
-        ];
-
-        for (const pattern of patterns) {
-          const matches = text.matchAll(pattern);
-          for (const match of matches) {
-            if (match[1]) {
-              if (match[1].startsWith('http://') || match[1].startsWith('https://')) {
-                return match[1];
-              } else if (match[1].match(/^[a-zA-Z0-9-]+$/)) {
-                return `https://www.linkedin.com/in/${match[1]}`;
-              }
-            }
-          }
-        }
-        return undefined;
-      };
-
       if (user.bio) {
-        linkedinUrl = extractLinkedInFromText(user.bio);
+        const bioLinks = parseSocialLinksFromReadme(user.bio, username);
+        linkedinUrl = bioLinks.linkedin;
+        twitterUrl = bioLinks.twitter || bioLinks.x;
+        instagramUrl = bioLinks.instagram;
       }
 
       try {
         const readmeContent = await this.fetchReadmeContent(username);
         if (readmeContent) {
-          const socialLinks = parseSocialLinksFromReadme(readmeContent);
-          if (!linkedinUrl) {
+          const socialLinks = parseSocialLinksFromReadme(readmeContent, username);
+          if (!linkedinUrl && socialLinks.linkedin) {
             linkedinUrl = socialLinks.linkedin;
           }
-          if (!twitterUrl) {
+          if (!twitterUrl && (socialLinks.twitter || socialLinks.x)) {
             twitterUrl = socialLinks.twitter || socialLinks.x;
           }
-          if (!instagramUrl) {
+          if (!instagramUrl && socialLinks.instagram) {
             instagramUrl = socialLinks.instagram;
           }
         }
@@ -320,9 +298,27 @@ export class GitHubProfileFetcher {
         const trimmedUrl = url.trim();
         if (!trimmedUrl) return null;
         if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
-          return trimmedUrl;
+          try {
+            new URL(trimmedUrl);
+            return trimmedUrl;
+          } catch {
+            return null;
+          }
         }
         return `https://${trimmedUrl}`;
+      };
+
+      const extractTwitterUsername = (url: string | undefined): string | null => {
+        if (!url) return null;
+        try {
+          const urlObj = new URL(url);
+          const pathname = urlObj.pathname;
+          const username = pathname.split('/').filter(Boolean)[0];
+          return username || null;
+        } catch {
+          const match = url.match(/(?:twitter\.com|x\.com)\/([a-zA-Z0-9_]+)/);
+          return match ? match[1] : null;
+        }
       };
 
       const metrics = await this.fetchPRStatistics(username);
@@ -335,7 +331,7 @@ export class GitHubProfileFetcher {
         location: user.location,
         email: user.email,
         website: normalizeWebsiteUrl(user.websiteUrl),
-        twitter_username: user.twitterUsername || (twitterUrl ? new URL(twitterUrl).pathname.split('/').pop() || null : null),
+        twitter_username: user.twitterUsername || extractTwitterUsername(twitterUrl) || null,
         linkedin_url: linkedinUrl,
         instagram_url: instagramUrl,
         company: user.company,

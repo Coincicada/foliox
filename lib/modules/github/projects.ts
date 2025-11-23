@@ -1,7 +1,9 @@
-import { GitHubProfileFetcher } from './fetcher';
 import { FeaturedProject, ProjectsData } from '@/types/github';
-import { graphql } from '@octokit/graphql';
 import { Settings } from '@/lib/config/settings';
+import { GitHubRepositoryFetcher, Repository } from './repository-fetcher';
+import { ProjectScorer } from './project-scorer';
+import { LanguageRanker } from './language-ranker';
+import { graphql } from '@octokit/graphql';
 
 const graphqlWithAuth = Settings.GITHUB_TOKEN
   ? graphql.defaults({
@@ -11,171 +13,207 @@ const graphqlWithAuth = Settings.GITHUB_TOKEN
     })
   : graphql;
 
-const PINNED_REPOS_QUERY = `
+const REPO_DETAILS_QUERY = `
   query($username: String!) {
     user(login: $username) {
-      pinnedItems(first: 6, types: REPOSITORY) {
+      repositories(first: 100, privacy: PUBLIC, orderBy: {field: UPDATED_AT, direction: DESC}) {
         nodes {
-          ... on Repository {
+          name
+          description
+          url
+          homepageUrl
+          stargazerCount
+          forkCount
+          primaryLanguage {
             name
-            description
-            url
-            homepageUrl
-            stargazerCount
-            forkCount
-            primaryLanguage {
-              name
-              color
-            }
-            languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
-              edges {
-                size
-                node {
-                  name
-                  color
-                }
-              }
-            }
-            repositoryTopics(first: 10) {
-              nodes {
-                topic {
-                  name
-                }
-              }
-            }
-            isPrivate
-            isFork
-            updatedAt
-            createdAt
+            color
           }
+          languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+            edges {
+              size
+              node {
+                name
+                color
+              }
+            }
+          }
+          repositoryTopics(first: 10) {
+            nodes {
+              topic {
+                name
+              }
+            }
+          }
+          updatedAt
+          createdAt
         }
       }
     }
   }
 `;
 
+interface GraphQLRepository {
+  name: string;
+  description: string | null;
+  url: string;
+  homepageUrl: string | null;
+  stargazerCount: number;
+  forkCount: number;
+  primaryLanguage: {
+    name: string;
+    color: string;
+  } | null;
+  languages: {
+    edges: Array<{
+      size: number;
+      node: {
+        name: string;
+        color: string;
+      };
+    }>;
+  };
+  repositoryTopics: {
+    nodes: Array<{
+      topic: {
+        name: string;
+      };
+    }>;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+
 export class GitHubProjectRanker {
-  static async getFeatured(username: string): Promise<ProjectsData> {
-    if (!Settings.GITHUB_TOKEN) {
-      throw new Error('GITHUB_TOKEN is required. Please set it in your environment variables.');
-    }
-
+  private static async enrichRepositoriesWithGraphQL(
+    username: string
+  ): Promise<Map<string, GraphQLRepository>> {
     try {
-      const repositories = await GitHubProfileFetcher.fetchUserRepositories(username);
-      const nonForkRepos = repositories.filter(repo => !repo.isFork && !repo.isPrivate);
-
-      let featuredRepos: typeof repositories = [];
-
-      try {
-        const pinnedResult = await graphqlWithAuth<{
-          user: {
-            pinnedItems: {
-              nodes: Array<{
-                name: string;
-                description: string | null;
-                url: string;
-                homepageUrl: string | null;
-                stargazerCount: number;
-                forkCount: number;
-                primaryLanguage: {
-                  name: string;
-                  color: string;
-                } | null;
-                languages: {
-                  edges: Array<{
-                    size: number;
-                    node: {
-                      name: string;
-                      color: string;
-                    };
-                  }>;
-                };
-                repositoryTopics: {
-                  nodes: Array<{
-                    topic: {
-                      name: string;
-                    };
-                  }>;
-                };
-                isPrivate: boolean;
-                isFork: boolean;
-                updatedAt: string;
-                createdAt: string;
-              }>;
-            };
+      const result = await graphqlWithAuth<{
+        user: {
+          repositories: {
+            nodes: GraphQLRepository[];
           };
-        }>(PINNED_REPOS_QUERY, { username });
-
-        const pinnedRepos = pinnedResult.user?.pinnedItems?.nodes || [];
-        
-        if (pinnedRepos.length > 0) {
-          featuredRepos = pinnedRepos.map(pinned => ({
-            name: pinned.name,
-            description: pinned.description,
-            url: pinned.url,
-            homepageUrl: pinned.homepageUrl,
-            stargazerCount: pinned.stargazerCount,
-            forkCount: pinned.forkCount,
-            isPinned: true,
-            primaryLanguage: pinned.primaryLanguage,
-            languages: pinned.languages,
-            repositoryTopics: pinned.repositoryTopics,
-            isPrivate: pinned.isPrivate,
-            isFork: pinned.isFork,
-            updatedAt: pinned.updatedAt,
-            createdAt: pinned.createdAt,
-          }));
-        }
-      } catch {
-        // If pinned repos fail, fall through to star-based ranking
-      }
-
-      if (featuredRepos.length === 0) {
-        const rankedRepos = nonForkRepos
-          .map(repo => ({
-            repo,
-            score: this.calculateScore(repo),
-          }))
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 5);
-
-        featuredRepos = rankedRepos.map(({ repo }) => repo);
-      }
-
-      const featured: FeaturedProject[] = featuredRepos.map((repo) => {
-        const languages: { [key: string]: number } = {};
-        repo.languages.edges.forEach(edge => {
-          languages[edge.node.name] = edge.size;
-        });
-
-        return {
-          name: repo.name,
-          description: repo.description,
-          url: repo.url,
-          homepage: repo.homepageUrl || null,
-          stars: repo.stargazerCount,
-          forks: repo.forkCount,
-          language: repo.primaryLanguage?.name || null,
-          topics: repo.repositoryTopics.nodes.map(node => node.topic.name),
-          updated_at: repo.updatedAt,
-          created_at: repo.createdAt,
-          languages,
-        };
+        } | null;
+      }>(REPO_DETAILS_QUERY, {
+        username,
       });
 
-      const allLanguages: { [key: string]: number } = {};
-      let totalStars = 0;
+      if (!result.user) {
+        return new Map();
+      }
 
-      nonForkRepos.forEach(repo => {
-        totalStars += repo.stargazerCount;
-        repo.languages.edges.forEach(edge => {
-          allLanguages[edge.node.name] = (allLanguages[edge.node.name] || 0) + edge.size;
-        });
+      const repoMap = new Map<string, GraphQLRepository>();
+      result.user.repositories.nodes.forEach(repo => {
+        repoMap.set(repo.name, repo);
+      });
+
+      return repoMap;
+    } catch {
+      return new Map();
+    }
+  }
+
+  private static normalizeHomepageUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+    
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      try {
+        new URL(trimmed);
+        return trimmed;
+      } catch {
+        return null;
+      }
+    }
+    
+    if (trimmed.startsWith('//')) {
+      return `https:${trimmed}`;
+    }
+    
+    return `https://${trimmed}`;
+  }
+
+  private static convertToFeaturedProject(
+    repo: Repository,
+    gqlRepo?: GraphQLRepository
+  ): FeaturedProject {
+    if (gqlRepo) {
+      const languages: { [key: string]: number } = {};
+      gqlRepo.languages.edges.forEach(edge => {
+        languages[edge.node.name] = edge.size;
       });
 
       return {
+        name: gqlRepo.name,
+        description: gqlRepo.description,
+        url: gqlRepo.url,
+        homepage: this.normalizeHomepageUrl(gqlRepo.homepageUrl),
+        stars: gqlRepo.stargazerCount,
+        forks: gqlRepo.forkCount,
+        language: gqlRepo.primaryLanguage?.name || null,
+        topics: gqlRepo.repositoryTopics.nodes.map(node => node.topic.name),
+        updated_at: gqlRepo.updatedAt,
+        created_at: gqlRepo.createdAt,
+        languages,
+      };
+    }
+
+    return {
+      name: repo.name,
+      description: repo.description,
+      url: repo.html_url,
+      homepage: this.normalizeHomepageUrl(repo.homepage),
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      language: repo.language,
+      topics: repo.topics || [],
+      updated_at: repo.updated_at,
+      created_at: repo.created_at,
+      languages: {},
+    };
+  }
+
+  static async getFeatured(username: string): Promise<ProjectsData> {
+    if (!Settings.GITHUB_TOKEN) {
+      throw new Error(
+        'GITHUB_TOKEN is required. Please set it in your environment variables.'
+      );
+    }
+
+    try {
+      const [allRepos, pinnedRepoNames] = await Promise.all([
+        GitHubRepositoryFetcher.fetchAllRepositories(username),
+        GitHubRepositoryFetcher.fetchPinnedRepositories(username),
+      ]);
+
+      const topScoredRepos = ProjectScorer.getTopProjects(
+        allRepos,
+        pinnedRepoNames,
+        8
+      );
+
+      const gqlRepoMap = await this.enrichRepositoriesWithGraphQL(username);
+
+      const featured: FeaturedProject[] = topScoredRepos.map(repo =>
+        this.convertToFeaturedProject(repo, gqlRepoMap.get(repo.name))
+      );
+
+      const nonForkRepos = allRepos.filter(
+        repo => !repo.fork && !repo.archived && !repo.disabled
+      );
+
+      const totalStars = nonForkRepos.reduce(
+        (sum, repo) => sum + repo.stargazers_count,
+        0
+      );
+
+      const languages = LanguageRanker.getAllLanguages(nonForkRepos);
+
+      return {
         featured,
-        languages: allLanguages,
+        languages,
         total_stars: totalStars,
         total_repos: nonForkRepos.length,
       };
@@ -184,26 +222,4 @@ export class GitHubProjectRanker {
       throw new Error(`Failed to fetch projects: ${errorMessage}`);
     }
   }
-
-  private static calculateScore(repo: {
-    stargazerCount: number;
-    forkCount: number;
-    updatedAt: string;
-  }): number {
-    const starWeight = 10;
-    const forkWeight = 5;
-    const recentWeight = 2;
-
-    const daysSinceUpdate = Math.floor(
-      (Date.now() - new Date(repo.updatedAt).getTime()) / (1000 * 60 * 60 * 24)
-    );
-    const recencyScore = Math.max(0, 365 - daysSinceUpdate) / 365;
-
-    return (
-      repo.stargazerCount * starWeight +
-      repo.forkCount * forkWeight +
-      recencyScore * recentWeight * 100
-    );
-  }
 }
-

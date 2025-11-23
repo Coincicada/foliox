@@ -6,12 +6,13 @@ export interface APIResponse<T> {
   cached?: boolean;
 }
 
-export interface ProfileResponse extends NormalizedProfile {}
+export type ProfileResponse = NormalizedProfile;
 
-export interface ProjectsResponse extends ProjectsData {}
+export type ProjectsResponse = ProjectsData;
 
 export interface AboutResponse {
   about: AboutData | null;
+  cached?: boolean;
 }
 
 export interface LinkedInProfile {
@@ -37,7 +38,7 @@ export interface LinkedInProfile {
   skills: string[];
 }
 
-export interface LinkedInResponse extends LinkedInProfile {}
+export type LinkedInResponse = LinkedInProfile;
 
 export interface ErrorResponse {
   detail: string;

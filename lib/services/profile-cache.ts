@@ -1,0 +1,52 @@
+import { Settings } from '@/lib/config/settings';
+import { generatePortfolioProfile } from '@/lib/services/profile';
+import { CacheOptions, getCache, getCacheKey, setCache } from '@/lib/utils/cache';
+import type { NormalizedProfile } from '@/types/github';
+
+const PROFILE_CACHE_PREFIX = 'github_profile';
+
+const buildProfileTags = (username: string, extraTags?: string[]) => {
+  const baseTags = ['github_profile', `user:${username}`];
+  if (!extraTags || extraTags.length === 0) {
+    return baseTags;
+  }
+  const tagSet = new Set([...baseTags, ...extraTags]);
+  return Array.from(tagSet);
+};
+
+export interface CachedProfileResult {
+  profile: NormalizedProfile;
+  cached: boolean;
+  cacheKey: string;
+}
+
+export async function resolveProfile(
+  username: string,
+  options: CacheOptions = {}
+): Promise<CachedProfileResult> {
+  const cacheKey = getCacheKey(PROFILE_CACHE_PREFIX, username);
+  const tags = buildProfileTags(username, options.tags);
+  const ttl = options.ttl ?? Settings.DEFAULT_CACHE_TTL;
+
+  const cachedProfile = await getCache<NormalizedProfile>(cacheKey);
+  if (cachedProfile) {
+    return {
+      profile: { ...cachedProfile, cached: true },
+      cached: true,
+      cacheKey,
+    };
+  }
+
+  const freshProfile = await generatePortfolioProfile(username);
+  const profileToCache = { ...freshProfile, cached: false };
+
+  await setCache(cacheKey, profileToCache, { ttl, tags });
+
+  return {
+    profile: profileToCache,
+    cached: false,
+    cacheKey,
+  };
+}
+
+

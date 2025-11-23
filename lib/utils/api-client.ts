@@ -1,4 +1,5 @@
-import type { NormalizedProfile, ProjectsData, AboutData } from "@/types/github"
+import type { NormalizedProfile, ProjectsData } from "@/types/github"
+import type { AboutResponse } from "@/types/api"
 import type { PortfolioData, ContributionData } from "@/types/portfolio"
 
 interface FetchOptions {
@@ -79,7 +80,7 @@ export class APIClient {
   }
 
   async getAbout(username: string, options?: FetchOptions) {
-    return this.fetch<{ about: AboutData | null }>(
+    return this.fetch<AboutResponse>(
       `/api/user/${username}/about`,
       options
     )
