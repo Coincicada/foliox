@@ -72,7 +72,7 @@ export function IntroductionSection({ profile }: IntroductionSectionProps) {
         <ShareButton username={profile.username} />
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-        <div className="flex-1">
+        <div className="flex-1 order-2 sm:order-1">
           <h1 className="font-bold text-3xl md:text-5xl tracking-tight mb-2 text-foreground">
             {profile.name || profile.username}
           </h1>
@@ -118,7 +118,7 @@ export function IntroductionSection({ profile }: IntroductionSectionProps) {
             </div>
           )}
         </div>
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 order-1 sm:order-2">
           <Image
             src={profile.avatar_url}
             alt={`${profile.name || profile.username}'s Photo`}
