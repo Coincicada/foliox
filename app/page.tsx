@@ -1,19 +1,71 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
 import { FaGithub } from "react-icons/fa"
 import { FaWandMagicSparkles } from "react-icons/fa6"
+import { FaMapMarkerAlt, FaBuilding, FaUsers } from "react-icons/fa"
 import Link from "next/link"
 import { trackEvent } from "@/lib/utils/analytics"
+import type { NormalizedProfile } from "@/types/github"
 
 export default function LandingPage() {
   const [username, setUsername] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [previewUser, setPreviewUser] = useState<NormalizedProfile | null>(null)
+  const [isFetchingPreview, setIsFetchingPreview] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const trimmedUsername = username.trim()
+    
+    if (!trimmedUsername || trimmedUsername.length < 1) {
+      setPreviewUser(null)
+      return
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setIsFetchingPreview(true)
+      try {
+        const response = await fetch(`https://api.github.com/users/${trimmedUsername}`, {
+          headers: {
+            Accept: "application/vnd.github+json",
+          },
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setPreviewUser({
+            username: data.login,
+            name: data.name,
+            bio: data.bio,
+            avatar_url: data.avatar_url,
+            location: data.location,
+            email: data.email,
+            website: data.blog || null,
+            twitter_username: data.twitter_username,
+            company: data.company,
+            followers: data.followers,
+            following: data.following,
+            public_repos: data.public_repos,
+            created_at: data.created_at,
+          })
+        } else {
+          setPreviewUser(null)
+        }
+      } catch {
+        setPreviewUser(null)
+      } finally {
+        setIsFetchingPreview(false)
+      }
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [username])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,6 +162,69 @@ export default function LandingPage() {
                 KartikLabhshetwar
               </button>
             </div>
+
+            {previewUser && (
+              <div className="max-w-md mx-auto pt-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <Card className="border-border/50 shadow-lg">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <Image
+                        src={previewUser.avatar_url}
+                        alt={previewUser.username}
+                        width={64}
+                        height={64}
+                        className="rounded-full border-2 border-border"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-lg truncate">
+                            {previewUser.name || previewUser.username}
+                          </h3>
+                          {previewUser.name && (
+                            <span className="text-sm text-muted-foreground truncate">
+                              @{previewUser.username}
+                            </span>
+                          )}
+                        </div>
+                        {previewUser.bio && (
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                            {previewUser.bio}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                          {previewUser.location && (
+                            <div className="flex items-center gap-1">
+                              <FaMapMarkerAlt className="h-3 w-3" />
+                              <span>{previewUser.location}</span>
+                            </div>
+                          )}
+                          {previewUser.company && (
+                            <div className="flex items-center gap-1">
+                              <FaBuilding className="h-3 w-3" />
+                              <span>{previewUser.company}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1">
+                            <FaUsers className="h-3 w-3" />
+                            <span>{previewUser.followers} followers</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <FaGithub className="h-3 w-3" />
+                            <span>{previewUser.public_repos} repos</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {isFetchingPreview && username.trim() && (
+              <div className="max-w-md mx-auto pt-6 text-center text-sm text-muted-foreground">
+                Checking GitHub profile...
+              </div>
+            )}
           </div>
         </section>
       </main>

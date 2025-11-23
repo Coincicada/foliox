@@ -115,7 +115,7 @@ export default async function PortfolioPage({ params }: PageProps) {
     notFound()
   }
 
-  const wasCached = data.profile.cached ?? false
+  const wasCached = data.profile.cached === true
 
   return (
     <div className="min-h-screen bg-background relative">

@@ -15,7 +15,7 @@ export function PortfolioTracker({ username, wasCached }: PortfolioTrackerProps)
       cached: wasCached,
     });
 
-    if (!wasCached) {
+    if (wasCached === false) {
       trackEvent('portfolio-generated', {
         username,
       });

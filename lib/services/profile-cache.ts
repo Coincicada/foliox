@@ -30,8 +30,12 @@ export async function resolveProfile(
 
   const cachedProfile = await getCache<NormalizedProfile>(cacheKey);
   if (cachedProfile) {
+    const profileWithCacheFlag = {
+      ...cachedProfile,
+      cached: true as const,
+    };
     return {
-      profile: { ...cachedProfile, cached: true },
+      profile: profileWithCacheFlag,
       cached: true,
       cacheKey,
     };
