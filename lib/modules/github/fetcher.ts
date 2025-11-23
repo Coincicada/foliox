@@ -2,13 +2,13 @@ import { graphql } from '@octokit/graphql';
 import { Settings } from '@/lib/config/settings';
 import { NormalizedProfile, GitHubGraphQLUser } from '@/types/github';
 
-const graphqlWithAuth = graphql.defaults({
-  headers: Settings.GITHUB_TOKEN
-    ? {
-        authorization: `token ${Settings.GITHUB_TOKEN}`,
-      }
-    : {},
-});
+const graphqlWithAuth = Settings.GITHUB_TOKEN
+  ? graphql.defaults({
+      headers: {
+        authorization: `Bearer ${Settings.GITHUB_TOKEN}`,
+      },
+    })
+  : graphql;
 
 const USER_QUERY = `
   query($username: String!) {
@@ -70,6 +70,10 @@ const USER_QUERY = `
 
 export class GitHubProfileFetcher {
   static async fetchUserProfile(username: string): Promise<NormalizedProfile> {
+    if (!Settings.GITHUB_TOKEN) {
+      throw new Error('GITHUB_TOKEN is required. Please set it in your environment variables.');
+    }
+
     try {
       const result = await graphqlWithAuth<{ user: GitHubGraphQLUser }>(USER_QUERY, {
         username,
@@ -94,20 +98,33 @@ export class GitHubProfileFetcher {
         followers: user.followers.totalCount,
         following: user.following.totalCount,
         public_repos: user.repositories.totalCount,
-        created_at: user.repositories.nodes[0]?.createdAt || new Date().toISOString(),
+        created_at: user.createdAt || new Date().toISOString(),
         cached: false,
       };
 
       return normalizedProfile;
-    } catch (error: any) {
-      if (error.message?.includes('Could not resolve to a User')) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStatus = (error as { status?: number })?.status;
+
+      if (errorMessage.includes('Could not resolve to a User') || errorMessage.includes('NOT_FOUND')) {
         throw new Error(`GitHub user ${username} not found`);
       }
-      throw new Error(`Failed to fetch GitHub profile: ${error.message}`);
+      if (errorMessage.includes('Bad credentials') || errorStatus === 401) {
+        throw new Error('Invalid GitHub token. Please check your GITHUB_TOKEN environment variable.');
+      }
+      if (errorStatus === 403) {
+        throw new Error('GitHub API rate limit exceeded or token lacks required permissions.');
+      }
+      throw new Error(`Failed to fetch GitHub profile: ${errorMessage}`);
     }
   }
 
   static async fetchUserRepositories(username: string) {
+    if (!Settings.GITHUB_TOKEN) {
+      throw new Error('GITHUB_TOKEN is required. Please set it in your environment variables.');
+    }
+
     try {
       const result = await graphqlWithAuth<{ user: GitHubGraphQLUser }>(USER_QUERY, {
         username,
@@ -118,8 +135,20 @@ export class GitHubProfileFetcher {
       }
 
       return result.user.repositories.nodes;
-    } catch (error: any) {
-      throw new Error(`Failed to fetch repositories: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStatus = (error as { status?: number })?.status;
+
+      if (errorMessage.includes('Could not resolve to a User') || errorMessage.includes('NOT_FOUND')) {
+        throw new Error(`GitHub user ${username} not found`);
+      }
+      if (errorMessage.includes('Bad credentials') || errorStatus === 401) {
+        throw new Error('Invalid GitHub token. Please check your GITHUB_TOKEN environment variable.');
+      }
+      if (errorStatus === 403) {
+        throw new Error('GitHub API rate limit exceeded or token lacks required permissions.');
+      }
+      throw new Error(`Failed to fetch repositories: ${errorMessage}`);
     }
   }
 }

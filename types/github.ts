@@ -149,6 +149,8 @@ export interface GitHubGraphQLUser {
       createdAt: string;
     }>;
   };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface NormalizedProfile {

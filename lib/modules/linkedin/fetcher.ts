@@ -7,11 +7,13 @@ export class LinkedInProfileFetcher {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
         },
-        next: { revalidate: 86400 },
       });
 
       if (!response.ok) {
-        throw new Error(`LinkedIn profile not found: ${response.status}`);
+        if (response.status === 404) {
+          throw new Error(`LinkedIn profile not found for username: ${username}`);
+        }
+        throw new Error(`LinkedIn API error: ${response.status} ${response.statusText}`);
       }
 
       const html = await response.text();
@@ -30,8 +32,9 @@ export class LinkedInProfileFetcher {
       };
 
       return profile;
-    } catch (error: any) {
-      throw new Error(`Failed to fetch LinkedIn profile: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to fetch LinkedIn profile: ${errorMessage}`);
     }
   }
 
@@ -64,7 +67,7 @@ export class LinkedInProfileFetcher {
     return summaryMatch ? summaryMatch[1] : null;
   }
 
-  private extractExperience(html: string): Array<{
+  private extractExperience(_html: string): Array<{
     title: string;
     company: string;
     duration: string;
@@ -73,7 +76,7 @@ export class LinkedInProfileFetcher {
     return [];
   }
 
-  private extractEducation(html: string): Array<{
+  private extractEducation(_html: string): Array<{
     school: string;
     degree: string;
     field: string;
@@ -82,7 +85,7 @@ export class LinkedInProfileFetcher {
     return [];
   }
 
-  private extractSkills(html: string): string[] {
+  private extractSkills(_html: string): string[] {
     return [];
   }
 }
