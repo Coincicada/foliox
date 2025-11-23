@@ -17,10 +17,10 @@ export class AIDescriptionGenerator {
       const { text } = await generateText({
         model: this.model,
         system:
-          'You are a professional technical writer specializing in developer profiles. Create impactful, compelling content that showcases achievements and expertise. Prioritize impressive metrics and concrete accomplishments. Write clear, concise, professional content that makes the developer stand out. Focus on quantifiable achievements, technical expertise, and community impact. Use professional language suitable for a portfolio website. Make every word count - highlight what makes this developer exceptional.',
+          'You are an expert technical writer creating professional developer profiles. Your goal is to craft unique, compelling descriptions that authentically represent each developer. Avoid generic templates or formulaic language. Instead, analyze the specific data provided and create personalized content that highlights what makes this developer distinctive. Focus on their actual achievements, technical depth, and unique contributions. Write in a professional yet engaging tone suitable for a portfolio website. Every profile should feel authentic and tailored, not templated.',
         prompt,
-        temperature: 0.6,
-        maxOutputTokens: 550,
+        temperature: 0.7,
+        maxOutputTokens: 800,
       });
 
       return this.parseProfileSummary(text, profile);
@@ -62,52 +62,74 @@ Issues Closed: ${profile.metrics.issues_closed || 0}
       ? Math.floor((new Date().getTime() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 365))
       : 0;
 
-    return `Create a compelling professional developer profile summary for ${profile.name || profile.username}.
+    const contributionRate = profile.metrics?.total_contributions && yearsActive > 0
+      ? Math.round(profile.metrics.total_contributions / yearsActive)
+      : null;
 
-Profile Data:
+    return `Analyze the following developer profile and create a unique, professional description that authentically represents their work and achievements. Avoid generic templates or formulaic language.
+
+Developer Profile:
+Name: ${profile.name || profile.username}
+Username: ${profile.username}
 Bio: ${profile.bio || 'Not provided'}
 Location: ${profile.location || 'Not specified'}
 Company: ${profile.company || 'Not specified'}
+Website: ${profile.website || 'Not specified'}
 Public Repositories: ${profile.public_repos}
 Followers: ${profile.followers}
 Following: ${profile.following}
+GitHub Member Since: ${profile.created_at ? new Date(profile.created_at).getFullYear() : 'N/A'}
 Years Active: ${yearsActive > 0 ? yearsActive : 'N/A'}
 ${metrics}
+${contributionRate ? `Average Contributions/Year: ${contributionRate}` : ''}
 
-Generate impactful, professional content:
+Based on this data, generate:
 
-1. Summary (2-3 sentences): 
-   - Start with their name and key expertise areas
-   - Highlight their most impressive achievements (repositories, contributions, community impact)
-   - Mention their focus areas (open source, specific technologies, or development practices)
-   - Keep it professional, concise, and impactful
-   - Example format: "[Name] is a skilled developer with expertise in [areas]. With [X] public repositories and [Y] contributions, [they] have made significant impact in [domain]. [Their] work focuses on [specific focus]."
+1. Summary (3-4 sentences, 150-200 words):
+   - Write a compelling narrative that tells their story, not a template
+   - If they have a bio, use it as context but expand and professionalize it
+   - Highlight what makes them unique: their contribution patterns, repository count, community engagement, or professional background
+   - If they have high metrics, emphasize their impact and consistency
+   - If they're newer, focus on their growth trajectory and potential
+   - Mention specific achievements (e.g., "maintains X repositories" vs "has repositories")
+   - Connect their work to real-world impact when possible
+   - Use varied sentence structure - avoid repetitive patterns
+   - DO NOT use phrases like "is a skilled developer" or "has expertise in" unless contextually appropriate
 
-2. Highlights (4 items - prioritize most impressive metrics):
-   - Always include: "${profile.public_repos} public repositories" (if > 0)
-   - Always include: "${profile.followers} followers" (if > 0)
-   - Include merged PRs if available: "${profile.metrics?.prs_merged || 0} merged pull requests" (if > 0)
-   - Include total contributions if available: "${profile.metrics?.total_contributions || 0} total contributions" (if > 0)
-   - If metrics are missing, use: "Active in open source community" or "Based in ${profile.location}" (if location exists)
-   - Keep format consistent: "X [metric]" - no extra words
+2. Highlights (4-5 items):
+   - Prioritize the most impressive and unique metrics
+   - Format: Concise, metric-focused statements
+   - Include: "${profile.public_repos} public repositories" (if > 0)
+   - Include: "${profile.followers} GitHub followers" (if > 0)
+   - Include: "${profile.metrics?.prs_merged || 0} merged pull requests" (if > 0 and > 10)
+   - Include: "${profile.metrics?.total_contributions || 0} total contributions" (if > 0 and > 100)
+   - Include: "${contributionRate} average contributions per year" (if contributionRate > 50)
+   - Include: "Active for ${yearsActive} years" (if yearsActive >= 3)
+   - Include: "Based in ${profile.location}" (if location exists and is meaningful)
+   - Only include metrics that are meaningful (avoid zeros or very low numbers)
 
-3. Skills (6-8 items - based on their activity):
-   - Always include: "Software Development"
-   - Always include: "Version Control" or "Git"
-   - Always include: "Open Source Contributions"
-   - If PRs merged > 0: "Collaborative Development"
-   - If repositories > 20: "Project Management" or "Repository Management"
-   - If contributions > 100: "Community Engagement"
-   - If company exists: "Enterprise Development" or "Professional Software Engineering"
-   - Add relevant technical skills based on their bio/activity
-   - Use professional terminology, avoid generic terms
+3. Skills (6-10 items):
+   - Infer skills from their activity patterns, not from generic assumptions
+   - If they have many repos: "Repository Management", "Project Architecture"
+   - If they have many PRs: "Code Review", "Collaborative Development"
+   - If they have many contributions: "Open Source Contributions", "Community Engagement"
+   - If they have a company: "Enterprise Software Development"
+   - If yearsActive >= 5: "Software Engineering", "Technical Leadership"
+   - Always include: "Version Control" (they use Git)
+   - Add technical skills based on their bio if mentioned
+   - Use specific, professional terminology
+   - Avoid generic terms like "Coding" or "Programming"
 
-IMPORTANT: Return ONLY valid JSON. Do not include markdown code blocks, explanations, or any text outside the JSON object. Start with { and end with }.
+CRITICAL: 
+- Create unique content, not a template
+- Analyze the actual data to infer their focus areas
+- Return ONLY valid JSON - no markdown, no explanations
+- Start with { and end with }
 
 {
-  "summary": "Professional 2-3 sentence summary with name, expertise, and key achievements...",
-  "highlights": ["X public repositories", "Y followers", "Z merged pull requests", "W total contributions"],
-  "skills": ["Software Development", "Version Control", "Open Source Contributions", ...]
+  "summary": "Write a unique, compelling 3-4 sentence professional summary...",
+  "highlights": ["metric 1", "metric 2", "metric 3", "metric 4"],
+  "skills": ["Skill 1", "Skill 2", "Skill 3", ...]
 }`;
   }
 

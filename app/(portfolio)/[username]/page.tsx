@@ -1,12 +1,15 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Topbar } from "@/components/portfolio/topbar"
-import { HeroSection } from "@/components/portfolio/hero-section"
+import { IntroductionSection } from "@/components/portfolio/introduction-section"
 import { CapabilitiesSection } from "@/components/portfolio/capabilities-section"
 import { WorkGallery } from "@/components/portfolio/work-gallery"
-import { ContributionGraph } from "@/components/portfolio/contribution-graph"
-import { PortfolioFooter } from "@/components/portfolio/footer"
+import { ProofOfWorkSection } from "@/components/portfolio/proof-of-work-section"
+import { WorkExperienceSection } from "@/components/portfolio/work-experience-section"
+import { PRsByOrgSection } from "@/components/portfolio/prs-by-org-section"
+import { GetInTouchSection } from "@/components/portfolio/get-in-touch-section"
 import type { PortfolioData } from "@/types/portfolio"
+import type { PRByOrg } from "@/components/portfolio/prs-by-org-section"
 import { createAPIClient } from "@/lib/utils/api-client"
 import { verifyUsername } from "@/lib/utils/user"
 import { getGithubUsernameByCustomSlug } from "@/lib/utils/custom-url"
@@ -20,6 +23,27 @@ async function fetchPortfolioData(username: string): Promise<PortfolioData | nul
   const client = createAPIClient(apiKey)
   
   return client.getFullPortfolio(username, { revalidate: 3600 })
+}
+
+async function fetchPRsByOrg(username: string): Promise<PRByOrg[]> {
+  try {
+    const apiKey = process.env.API_KEYS?.split(",")[0] || ""
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+    const response = await fetch(`${baseUrl}/api/user/${username}/prs-by-org`, {
+      headers: {
+        "X-API-Key": apiKey,
+      },
+      next: { revalidate: 3600 },
+    })
+
+    if (!response.ok) {
+      return []
+    }
+
+    return await response.json()
+  } catch {
+    return []
+  }
 }
 
 async function resolveUsername(rawUsername: string): Promise<string | null> {
@@ -81,7 +105,10 @@ export default async function PortfolioPage({ params }: PageProps) {
     notFound()
   }
   
-  const data = await fetchPortfolioData(username)
+  const [data, prsByOrg] = await Promise.all([
+    fetchPortfolioData(username),
+    fetchPRsByOrg(username),
+  ])
 
   if (!data) {
     notFound()
@@ -92,19 +119,20 @@ export default async function PortfolioPage({ params }: PageProps) {
       <Topbar profile={data.profile} />
 
       <main className="container mx-auto px-4 sm:px-6 max-w-6xl">
-        <HeroSection profile={data.profile} about={data.about} metrics={data.profile.metrics} />
+        <IntroductionSection profile={data.profile} />
         
         <CapabilitiesSection about={data.about} />
         
         <WorkGallery projects={data.projects} />
 
-        {data.projects && data.projects.featured.length > 0 && (
-          <ContributionGraph username={username} />
-        )}
-       
+        <ProofOfWorkSection username={username} />
+
+        <PRsByOrgSection prsByOrg={prsByOrg} username={username} />
+
+        <WorkExperienceSection profile={data.profile} />
       </main>
 
-      <PortfolioFooter profile={data.profile} />
+      <GetInTouchSection profile={data.profile} />
     </div>
   )
 }

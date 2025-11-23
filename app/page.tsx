@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Github, Wand2, Rocket, GitBranch, Sparkles, Zap, Globe, Star } from "lucide-react"
+import { Github, Wand2, Star } from "lucide-react"
 import Link from "next/link"
 
 export default function LandingPage() {
@@ -138,95 +137,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-
-        {/* Features */}
-        <section className="py-20 bg-muted/30 border-y border-border/50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Foliox?</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Everything you need to showcase your developer journey in one beautiful portfolio
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="bg-card border-border/50 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                    <Sparkles className="h-6 w-6" />
-                  </div>
-                  <CardTitle>AI-Powered Summaries</CardTitle>
-                  <CardDescription>
-                    Groq AI analyzes your repositories and contributions to generate professional project descriptions, 
-                    technical highlights, and compelling case studies automatically.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="bg-card border-border/50 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                    <Zap className="h-6 w-6" />
-                  </div>
-                  <CardTitle>Zero Setup Required</CardTitle>
-                  <CardDescription>
-                    No sign-ups, no configurations. Enter your GitHub username and get an instant, 
-                    shareable portfolio URL. Your portfolio is live in seconds.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="bg-card border-border/50 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                    <GitBranch className="h-6 w-6" />
-                  </div>
-                  <CardTitle>Live GitHub Sync</CardTitle>
-                  <CardDescription>
-                    Your portfolio automatically updates as you push new code, create repositories, 
-                    and contribute to open source. Always reflects your latest work.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="bg-card border-border/50 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                    <Globe className="h-6 w-6" />
-                  </div>
-                  <CardTitle>Custom Share URLs</CardTitle>
-                  <CardDescription>
-                    Create memorable custom URLs for your portfolio instead of using your GitHub username. 
-                    Perfect for sharing on resumes, LinkedIn, or business cards.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="bg-card border-border/50 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                    <Rocket className="h-6 w-6" />
-                  </div>
-                  <CardTitle>SEO Optimized</CardTitle>
-                  <CardDescription>
-                    Every portfolio is built with SEO best practices. Dynamic metadata, semantic HTML, 
-                    and optimized content help you rank better in search results.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="bg-card border-border/50 transition-all hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                    <Wand2 className="h-6 w-6" />
-                  </div>
-                  <CardTitle>Smart Caching</CardTitle>
-                  <CardDescription>
-                    Intelligent database caching ensures lightning-fast portfolio generation while minimizing 
-                    API calls. Your portfolio loads instantly, every time.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </div>
-          </div>
-        </section>
       </main>
 
-      <footer className="border-t border-border bg-muted/30">
+      <footer className="border-t border-border bg-[#F8F7F3]">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
@@ -239,13 +152,13 @@ export default function LandingPage() {
               />
               <span className="text-sm font-medium text-foreground">Foliox</span>
             </div>
-            <p className="text-center text-sm text-muted-foreground md:text-left">
+            <p className="text-sm text-foreground">
               Built by{" "}
               <a 
                 href="https://github.com/kartiklabhshetwar" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="font-medium text-foreground hover:text-primary transition-colors underline underline-offset-4"
+                className="underline hover:text-primary transition-colors"
               >
                 Kartik
               </a>
@@ -254,7 +167,7 @@ export default function LandingPage() {
                 href="https://github.com/kartiklabhshetwar/foliox" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="font-medium text-foreground hover:text-primary transition-colors underline underline-offset-4"
+                className="underline hover:text-primary transition-colors"
               >
                 GitHub
               </a>
