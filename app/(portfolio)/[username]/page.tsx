@@ -91,7 +91,7 @@ export default async function PortfolioPage({ params }: PageProps) {
     <div className="min-h-screen bg-background">
       <Topbar profile={data.profile} />
 
-      <main className="container mx-auto px-4 max-w-6xl">
+      <main className="container mx-auto px-4 sm:px-6 max-w-6xl">
         <HeroSection profile={data.profile} about={data.about} metrics={data.profile.metrics} />
         
         <CapabilitiesSection about={data.about} />

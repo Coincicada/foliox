@@ -22,17 +22,17 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
 
   if (!mounted) {
     return (
-      <section className="w-full py-16 border-b border-border">
-        <div className="space-y-8">
+      <section className="w-full py-8 sm:py-12 md:py-16 border-b border-border">
+        <div className="space-y-6 sm:space-y-8">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Contributions</h2>
-            <p className="text-sm text-muted-foreground mt-2">
+            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">Contributions</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
               Activity over the past year
             </p>
           </div>
           <Card className="border-border">
-            <CardContent className="p-6 md:p-8">
-              <div className="w-full h-[160px] bg-muted/50 animate-pulse rounded-md" />
+            <CardContent className="p-4 sm:p-6 md:p-8">
+              <div className="w-full h-[120px] sm:h-[160px] bg-muted/50 animate-pulse rounded-md" />
             </CardContent>
           </Card>
         </div>
@@ -41,28 +41,32 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
   }
 
   return (
-    <section className="w-full py-16 border-b border-border">
-      <div className="space-y-8">
+    <section className="w-full py-8 sm:py-12 md:py-16 border-b border-border">
+      <div className="space-y-6 sm:space-y-8">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Contributions</h2>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">Contributions</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
             Activity over the past year
           </p>
         </div>
         <Card className="border-border">
-          <CardContent className="p-6 md:p-8">
-            <div className="w-full flex justify-center overflow-x-auto">
+          <CardContent className="p-4 sm:p-6 md:p-8">
+            <div className="w-full flex justify-center overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
               <div className="min-w-fit">
                 <GitHubCalendar
                   username={username}
-                  fontSize={12}
-                  blockSize={12}
-                  blockMargin={4}
+                  fontSize={10}
+                  blockSize={10}
+                  blockMargin={3}
                   showWeekdayLabels={true}
                   colorScheme="light"
                   theme={{
                     light: theme.light,
                     dark: theme.dark,
+                  }}
+                  style={{
+                    width: "100%",
+                    maxWidth: "100%",
                   }}
                 />
               </div>
