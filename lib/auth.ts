@@ -7,13 +7,13 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   socialProviders: {
-    github: {
+    github: { 
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
       scope: ["read:user", "user:email", "repo"],
     },
   },
-  baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
   basePath: "/api/auth",
 });
 

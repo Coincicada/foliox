@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyUsername } from '@/lib/utils/user';
 import { resolveProfile } from '@/lib/services/profile-cache';
 import { getSessionUserToken } from '@/lib/utils/github-token';
+import { isOwner } from '@/lib/utils/owner-check';
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +13,8 @@ export async function GET(
     const username = verifyUsername(rawUsername);
 
     const userToken = await getSessionUserToken(request);
-    const { profile } = await resolveProfile(username, { userToken });
+    const ownerViewing = await isOwner(request, username);
+    const { profile } = await resolveProfile(username, { userToken, isOwner: ownerViewing });
 
     return NextResponse.json(profile, { status: 200 });
   } catch (error: unknown) {

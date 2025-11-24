@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GitHubProjectRanker } from '@/lib/modules/github/projects';
 import { verifyUsername } from '@/lib/utils/user';
 import { createCachedFunction } from '@/lib/utils/cache';
-import { ProjectsData } from '@/types/github';
 import { getSessionUserToken } from '@/lib/utils/github-token';
+import { isOwner } from '@/lib/utils/owner-check';
 
-function getCachedProjects(username: string, userToken?: string | null) {
-  const cacheKey = userToken ? `github_projects_${username}_auth` : `github_projects_${username}`;
+function getCachedProjects(username: string, userToken?: string | null, isOwnerViewing: boolean = false) {
+  const cacheKey = `github_projects_${username}`;
+  const tokenToUse = isOwnerViewing ? userToken : null;
+  
   const cachedFn = createCachedFunction(
-    () => GitHubProjectRanker.getFeatured(username, userToken),
+    () => GitHubProjectRanker.getFeatured(username, tokenToUse),
     [cacheKey, username],
     {
       ttl: 3600,
@@ -27,7 +29,8 @@ export async function GET(
     const username = verifyUsername(rawUsername);
 
     const userToken = await getSessionUserToken(request);
-    const projectData = await getCachedProjects(username, userToken);
+    const ownerViewing = await isOwner(request, username);
+    const projectData = await getCachedProjects(username, userToken, ownerViewing);
 
     return NextResponse.json(projectData, { status: 200 });
   } catch (error) {
