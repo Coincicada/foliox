@@ -42,7 +42,7 @@ foliox/
 │   ├── portfolio/                 # Portfolio-specific components
 │   │   ├── hero-section.tsx
 │   │   ├── share-button.tsx      # Share dialog with custom URL creation
-│   │   ├── projects-section.tsx
+│   │   ├── projects-section.tsx 
 │   │   ├── project-image.tsx     # Client component for project screenshots with fallback
 │   │   └── ...
 │   └── ui/                        # Reusable UI components (Shadcn)
