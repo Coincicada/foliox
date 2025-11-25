@@ -58,7 +58,7 @@ export function UserMenu() {
         </button>
       }
     >
-      <PopoverContent className="w-64 p-0 bg-white/95 backdrop-blur-lg border-white/20">
+      <PopoverContent className="w-64 p-0 bg-popover/95 backdrop-blur-lg border-border">
         <div className="p-4 border-b border-border/50">
           <div className="flex items-center gap-3">
             {session.user.image && (

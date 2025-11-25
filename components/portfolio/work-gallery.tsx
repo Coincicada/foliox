@@ -23,9 +23,9 @@ export function WorkGallery({ projects }: WorkGalleryProps) {
     : 0
 
   return (
-    <section className="relative w-full py-8 sm:py-12 md:py-16">
+    <section className="relative w-full py-6 sm:py-8 md:py-12">
       <SectionBorder className="absolute bottom-0 left-0 right-0" />
-      <div className="space-y-8 sm:space-y-10">
+      <div className="space-y-6 sm:space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-3 sm:gap-4">
           <div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">Featured Work</h2>
@@ -35,7 +35,7 @@ export function WorkGallery({ projects }: WorkGalleryProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {(isExpanded ? projects.featured : projects.featured.slice(0, 6)).map((project) => {
             const urlParts = project.url.split('/')
             const owner = urlParts[urlParts.length - 2]
@@ -62,9 +62,9 @@ export function WorkGallery({ projects }: WorkGalleryProps) {
                     unoptimized
                   />
                 </div>
-                <CardContent className="flex-1 p-5 sm:p-6 flex flex-col gap-4">
-                  <div className="space-y-2.5 min-w-0">
-                    <h3 className="font-bold text-lg sm:text-xl leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
+                <CardContent className="flex-1 p-4 sm:p-5 flex flex-col gap-3">
+                  <div className="space-y-2 min-w-0">
+                    <h3 className="font-bold text-lg leading-tight tracking-tight text-foreground group-hover:text-primary transition-colors">
                       {project.name}
                     </h3>
                     {project.description && (
@@ -83,7 +83,7 @@ export function WorkGallery({ projects }: WorkGalleryProps) {
                           <Badge 
                             key={lang} 
                             variant="outline" 
-                            className="text-xs font-medium px-2.5 py-1 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                            className="text-xs font-medium px-2 py-0.5 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-colors"
                           >
                             {lang}
                           </Badge>

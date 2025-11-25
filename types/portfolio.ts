@@ -1,5 +1,7 @@
 import type { NormalizedProfile, AboutData, SEOData, ProjectsData, FeaturedProject } from './github'
 
+export type { NormalizedProfile, AboutData, SEOData, ProjectsData, FeaturedProject }
+
 export interface PortfolioData {
   profile: NormalizedProfile;
   about?: AboutData | null;

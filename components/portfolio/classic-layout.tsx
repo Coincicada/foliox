@@ -1,0 +1,51 @@
+import { IntroductionSection } from "@/components/portfolio/introduction-section"
+import { CapabilitiesSection } from "@/components/portfolio/capabilities-section"
+import { WorkGallery } from "@/components/portfolio/work-gallery"
+import { ProofOfWorkSection } from "@/components/portfolio/proof-of-work-section"
+import { WorkExperienceSection } from "@/components/portfolio/work-experience-section"
+import { PRsByOrgSection } from "@/components/portfolio/prs-by-org-section"
+import { GetInTouchSection } from "@/components/portfolio/get-in-touch-section"
+import DiagonalPattern from "@/components/portfolio/diagonal-pattern"
+import type { NormalizedProfile } from "@/types/github"
+import type { AboutData } from "@/types/portfolio"
+import type { ProjectsData } from "@/types/github"
+import type { PRByOrg } from "@/components/portfolio/prs-by-org-section"
+
+interface ClassicLayoutProps {
+  profile: NormalizedProfile
+  about: AboutData | null
+  projects?: ProjectsData
+  username: string
+  prsByOrg: PRByOrg[]
+}
+
+export function ClassicLayout({
+  profile,
+  about,
+  projects,
+  username,
+  prsByOrg,
+}: ClassicLayoutProps) {
+  return (
+    <div className="min-h-screen bg-background relative">
+      <DiagonalPattern side="left" />
+      <DiagonalPattern side="right" />
+
+      <main className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
+        <IntroductionSection profile={profile} />
+        
+        <WorkExperienceSection profile={profile} />
+        
+        <CapabilitiesSection about={about} />
+        
+        <WorkGallery projects={projects} />
+
+        <ProofOfWorkSection username={username} />
+
+        <PRsByOrgSection prsByOrg={prsByOrg} username={username} />
+      </main>
+
+      <GetInTouchSection profile={profile} />
+    </div>
+  )
+}

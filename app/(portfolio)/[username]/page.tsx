@@ -1,14 +1,8 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { IntroductionSection } from "@/components/portfolio/introduction-section"
-import { CapabilitiesSection } from "@/components/portfolio/capabilities-section"
-import { WorkGallery } from "@/components/portfolio/work-gallery"
-import { ProofOfWorkSection } from "@/components/portfolio/proof-of-work-section"
-import { WorkExperienceSection } from "@/components/portfolio/work-experience-section"
-import { PRsByOrgSection } from "@/components/portfolio/prs-by-org-section"
-import { GetInTouchSection } from "@/components/portfolio/get-in-touch-section"
+import { ClassicLayout } from "@/components/portfolio/classic-layout"
+import { BentoLayout } from "@/components/portfolio/bento-layout"
 import { PortfolioTracker } from "@/components/portfolio/portfolio-tracker"
-import DiagonalPattern from "@/components/portfolio/diagonal-pattern"
 import type { PortfolioData } from "@/types/portfolio"
 import type { PRByOrg } from "@/components/portfolio/prs-by-org-section"
 import { createAPIClient } from "@/lib/utils/api-client"
@@ -17,6 +11,7 @@ import { getGithubUsernameByCustomSlug } from "@/lib/utils/custom-url"
 
 interface PageProps {
   params: Promise<{ username: string }>
+  searchParams: Promise<{ layout?: string }>
 }
 
 async function fetchPortfolioData(username: string): Promise<PortfolioData | null> {
@@ -98,8 +93,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function PortfolioPage({ params }: PageProps) {
+export default async function PortfolioPage({ params, searchParams }: PageProps) {
   const { username: rawUsername } = await params
+  const { layout } = await searchParams
   const username = await resolveUsername(rawUsername)
   
   if (!username) {
@@ -116,29 +112,29 @@ export default async function PortfolioPage({ params }: PageProps) {
   }
 
   const wasCached = data.profile.cached === true
+  const isBento = layout === "bento"
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <>
       <PortfolioTracker username={username} wasCached={wasCached} />
-      <DiagonalPattern side="left" />
-      <DiagonalPattern side="right" />
-
-      <main className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
-        <IntroductionSection profile={data.profile} />
-        
-        <WorkExperienceSection profile={data.profile} />
-        
-        <CapabilitiesSection about={data.about} />
-        
-        <WorkGallery projects={data.projects} />
-
-        <ProofOfWorkSection username={username} />
-
-        <PRsByOrgSection prsByOrg={prsByOrg} username={username} />
-      </main>
-
-      <GetInTouchSection profile={data.profile} />
-    </div>
+      
+      {isBento ? (
+        <BentoLayout
+          profile={data.profile}
+          about={data.about || null}
+          projects={data.projects}
+          username={username}
+          prsByOrg={prsByOrg}
+        />
+      ) : (
+        <ClassicLayout
+          profile={data.profile}
+          about={data.about || null}
+          projects={data.projects}
+          username={username}
+          prsByOrg={prsByOrg}
+        />
+      )}
+    </>
   )
 }
-
