@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,7 +57,26 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          themes={[
+            "light",
+            "dark",
+            "vintage-light",
+            "vintage-dark",
+            "mono-light",
+            "mono-dark",
+            "neobrutalism-light",
+            "neobrutalism-dark",
+            "t3chat-light",
+            "t3chat-dark",
+          ]}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

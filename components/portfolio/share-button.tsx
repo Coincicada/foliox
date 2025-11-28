@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,6 +19,7 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ username }: ShareButtonProps) {
+  const searchParams = useSearchParams()
   const [copied, setCopied] = useState(false)
   const [open, setOpen] = useState(false)
   const [canShare, setCanShare] = useState(false)
@@ -32,14 +34,21 @@ export function ShareButton({ username }: ShareButtonProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const baseUrl = window.location.origin
-      if (registeredSlug) {
-        setPortfolioUrl(`${baseUrl}/${registeredSlug}`)
-      } else {
-        setPortfolioUrl(`${baseUrl}/${username}`)
+      const layout = searchParams.get("layout")
+      const params = new URLSearchParams()
+      
+      if (layout) {
+        params.set("layout", layout)
       }
+      
+      const queryString = params.toString()
+      const urlPath = registeredSlug ? `/${registeredSlug}` : `/${username}`
+      const fullUrl = queryString ? `${baseUrl}${urlPath}?${queryString}` : `${baseUrl}${urlPath}`
+      
+      setPortfolioUrl(fullUrl)
       setCanShare(typeof navigator !== 'undefined' && 'share' in navigator)
     }
-  }, [username, registeredSlug])
+  }, [username, registeredSlug, searchParams])
 
   const checkAvailability = useCallback(async (slug: string) => {
     if (!slug || slug.length < 3) {
@@ -180,7 +189,7 @@ export function ShareButton({ username }: ShareButtonProps) {
                 <label className="text-sm font-medium text-foreground">Create Custom URL (Optional)</label>
                 <div className="flex gap-2">
                   <div className="flex-1 flex items-center border border-input rounded-md bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-                    <span className="px-3 text-sm text-muted-foreground whitespace-nowrap border-r border-input bg-muted/50 py-2">
+                    <span className="px-3 text-sm text-muted-foreground whitespace-nowrap border-r border-input bg-muted/50 py-2 max-w-[120px] sm:max-w-[200px] overflow-hidden text-ellipsis">
                       {typeof window !== 'undefined' ? new URL(window.location.href).origin : ''}/
                     </span>
                     <Input

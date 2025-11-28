@@ -7,6 +7,7 @@ import SectionBorder from './section-border';
 import { ShareButton } from './share-button';
 import { UserMenu } from '@/components/auth/user-menu';
 import { GitHubLoginButton } from '@/components/auth/github-login-button';
+import { PortfolioControls } from './portfolio-controls';
 
 interface IntroductionSectionProps {
   profile: NormalizedProfile;
@@ -70,6 +71,7 @@ export function IntroductionSection({ profile }: IntroductionSectionProps) {
         <div className="flex items-center gap-2">
           <UserMenu />
           <GitHubLoginButton />
+          <PortfolioControls />
           <ShareButton username={profile.username} />
         </div>
       </div>
