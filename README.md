@@ -243,16 +243,18 @@ The application uses a database-backed caching system for most endpoints:
 - Cache is checked before making external API calls
 - Most portfolio endpoints use caching to reduce API calls and improve performance
 
-## Deployment
+## Contributors
 
-### Vercel (Recommended)
+Thanks to all our amazing contributors for their support and code!
 
-1. Push your code to GitHub
-2. Import the project in Vercel
-3. Set all environment variables in the Vercel dashboard
-4. Deploy
+<a href="https://github.com/KartikLabhshetwar/foliox/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=KartikLabhshetwar/foliox" />
+</a>
 
-The application will automatically run database migrations on first deployment.
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=KartikLabhshetwar/foliox&type=Date)](https://star-history.com/#KartikLabhshetwar/foliox&Date)
+
 
 ### Other Platforms
 
