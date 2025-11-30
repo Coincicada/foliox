@@ -243,14 +243,6 @@ The application uses a database-backed caching system for most endpoints:
 - Cache is checked before making external API calls
 - Most portfolio endpoints use caching to reduce API calls and improve performance
 
-## Contributors
-
-Thanks to all our amazing contributors for their support and code!
-
-<a href="https://github.com/KartikLabhshetwar/foliox/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=KartikLabhshetwar/foliox" />
-</a>
-
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=KartikLabhshetwar/foliox&type=Date)](https://star-history.com/#KartikLabhshetwar/foliox&Date)
